@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Quick Start</title>
+  <meta name="description" content="The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+<link rel="canonical" href="/guide/quick-start/">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/guide">Guide</a>
+        <a class="page-link" href="/api">API Docs</a>
+        <a class="page-link" href="/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Quick Start</h1>
+  </header>
+
+  <div class="post-content">
+    <h2 id="quick-start">Quick Start</h2>
+
+<p>Be sure <a href="/guide/requirements" title="The Clusternator Requirements">to have the requirements installed</a></p>
+
+<p>Quick start assumes your organization already has a running clusternator server,
+configured for your organization’s cloud.  This also assumes that your
+organization has a <em>private</em> GitHub repository for your project.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">npm install -g clusternator</code></li>
+  <li><code class="highlighter-rouge">git clone ssh://git@github.com/my-organization/my-cool-project.git</code></li>
+  <li><code class="highlighter-rouge">cd my-cool-project</code></li>
+  <li><code class="highlighter-rouge">clusternator init</code></li>
+  <li>Follow the prompts</li>
+  <li>If everything goes well there will be a <code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code>, and a
+<code class="highlighter-rouge">GITHUB_KEY</code>  provided at the end of the init</li>
+  <li>Turn on CircleCI for <code class="highlighter-rouge">my-cool-project</code></li>
+  <li><em>One</em> (1) environment variables need to be added:
+    <ul>
+      <li><code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code> (from init)</li>
+    </ul>
+  </li>
+  <li>Navigate to the <code class="highlighter-rouge">github.com/my-organization/my-cool-project.git</code> repository’s
+web interface</li>
+  <li>Click <code class="highlighter-rouge">settings</code></li>
+  <li>On the left nav bar click <code class="highlighter-rouge">webhooks &amp; services</code>
+    <ul>
+      <li>In the payload URL field enter: https://the-clusternator.my-organization.com/0.1/github</li>
+      <li>Leave the content type as JSON</li>
+      <li>Paste the login token in the “secret” field</li>
+      <li>Set “Which events would you like to trigger this webhook?” to “Everything”</li>
+      <li>Click Add</li>
+    </ul>
+  </li>
+</ul>
+
+<p>That’s it the project will produce new deployments each time a pull request is
+issued.  The project will tear down those deployments when PR’s close.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">The Clusternator Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-3">
+        <p>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+
+          The Clusternator uses the
+          <span><a href="/LICENSE">MIT License</a></span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

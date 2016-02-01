@@ -80,73 +80,18 @@
 
     <section>
         <article><h1>THE CLUSTERNATOR</h1><p><em>Status</em>: alpha</p>
-<p><a href="http://the-clusternator.rangle.io" title="The Clusternator Web Site &amp; Documentation">The Clusternator Web Site &amp; Documentation</a></p>
-<p>The Clusternator attempts to make managing deployments of containers easy for 
+<ul>
+<li><a href="http://the-clusternator.rangle.io" title="The Clusternator Web Site &amp; Documentation">The Clusternator Web Site &amp; Documentation</a></li>
+<li><a href="http://the-clusternator.rangle.io" title="The Clusternator Requirements">Requirements</a></li>
+<li><a href="http://the-clusternator.rangle.io/guide/quick-start" title="Clusternator Quick Start">Quick Start</a></li>
+<li><a href="http://the-clusternator.rangle.io" title="Installing The Clusternator">Installation</a></li>
+<li><a href="http://the-clusternator.rangle.io/guide/dev" title="Developing/Contributing to The Clusternator">Developing and Contributing</a></li>
+</ul>
+<h2>About</h2><p>The Clusternator attempts to make managing deployments of containers easy for 
 front end developers.  Specifically The Clusternator was built to fill the
 deoployment challenges of CI setups.</p>
 <p>The current version of The Clusternator uses Docker containers on Amazon's AWS
 infrastructure.  </p>
-<p>There are two components to The Clusternator.  The command line client, and the
-server.  Although it is not <em>strictly</em> necessary to run a server it is the
-target use case, and use of a clusternator server will be assumed, unless 
-otherwise noted.</p>
-<h2>Client Requirements</h2><ul>
-<li><a href="https://nodejs.org/en/" title="Node JS">NodeJs</a> &gt;= 12</li>
-<li><a href="https://www.gnupg.org/" title="GNU Privacy Guard">GPG</a>  ~1.4 not included in OS X 
-or Windows</li>
-<li>OpenSSH (included on OS X, GNU/Linux)</li>
-<li><a href="https://docker.io">Docker</a> (optional)</li>
-</ul>
-<h2>Server Requirements</h2><ul>
-<li><a href="https://nodejs.org/en/" title="Node JS">NodeJs</a> &gt;= 4.2.6</li>
-</ul>
-<p>The server is designed to be deployed as a Docker container, so in a way, 
-Docker is a requirement.</p>
-<h2>Installation (Client)</h2><p>Make sure your system has the third party requirements, then from a shell run:</p>
-<pre class="prettyprint source lang-bash"><code>npm install -g clusternator</code></pre><h2>Installation (Server)</h2><p><em>note this is <em>NOT</em> yet completely implemented</em></p>
-<p>These instructions assume that by installing the server the user will be using
-a clusternator CLI client to deploy a clusternator server to a cloud service.</p>
-<p>Having a locally installed copy of Docker is required for this.</p>
-<pre class="prettyprint source lang-bash"><code>clusternator bootstrap</code></pre><p>There will be a series of prompts.  Once this is done other clients will be
-able to start using your clusternator server.</p>
-<h2>Quick Start</h2><p>Quick start assumes your organization already has a running clusternator server,
-configured for your organization's cloud.  This also assumes that your
-organization has a <em>private</em> GitHub repository for your project.</p>
-<ul>
-<li><code>npm install -g clusternator</code></li>
-<li><code>git clone ssh://git@github.com/my-organization/my-cool-project.git</code></li>
-<li><code>cd my-cool-project</code></li>
-<li><code>clusternator init</code></li>
-<li>Follow the prompts</li>
-<li>If everything goes well there will be a <code>CLUSTERNATOR_SHARED_KEY</code>, and a
-<code>GITHUB_KEY</code>  provided at the end of the init</li>
-<li>Turn on CircleCI for <code>my-cool-project</code></li>
-<li><em>One</em> (1) environment variables need to be added:<ul>
-<li><code>CLUSTERNATOR_SHARED_KEY</code> (from init)</li>
-</ul>
-</li>
-<li>Navigate to the <code>github.com/my-organization/my-cool-project.git</code> repository's
-web interface</li>
-<li>Click <code>settings</code></li>
-<li>On the left nav bar click <code>webhooks &amp; services</code><ul>
-<li>In the payload URL field enter: https://the-clusternator.my-organization.com/0.1/github</li>
-<li>Leave the content type as JSON</li>
-<li>Paste the login token in the &quot;secret&quot; field</li>
-<li>Set &quot;Which events would you like to trigger this webhook?&quot; to &quot;Everything&quot;</li>
-<li>Click Add</li>
-</ul>
-</li>
-</ul>
-<p>That's it the project will produce new deployments each time a pull request is
-issued.  The project will tear down those deployments when PR's close.</p>
-<h2>Developing Clusternator</h2><p><em>yay contributions!</em></p>
-<p>All code is in <code>src/</code>. The CLI entry point is <code>bin/clusternator-cli.js</code>,
-but includes from <code>lib/</code> (the compile destination).</p>
-<p>There are unit tests, and repl tests.  Unit tests can be done by running
-<code>npm test</code>, assuming the project has been <code>npm install</code>'d.  This is an alias
-to <code>gulp test-unit</code></p>
-<p>Code coverage can be found <em>after</em> tests are run, and is located in the
-(generated) <code>coverage</code> folder.  Coverage includes lcov, json, and html.</p>
 <h2>License</h2><p>Copyright (c) 2015 rangle.io</p>
 <p><a href="https://github.com/rangle/the-clusternator/blob/master/LICENSE" title="Mit License">MIT License</a></p></article>
     </section>
@@ -184,7 +129,8 @@ to <code>gulp test-unit</code></p>
 
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Feb 01 2016 08:45:21 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Feb 01 2016 10:35:15 GMT-0500 (EST)
+  <span><a href="/LICENSE">MIT License</a></span>
 </footer>
 <script> prettyPrint(); </script>
 <script src="scripts/linenumber.js"> </script>

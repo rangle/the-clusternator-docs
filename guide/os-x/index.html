@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Running Clusternator On OS X</title>
+  <meta name="description" content="The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+<link rel="canonical" href="/guide/os-x/">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/guide">Guide</a>
+        <a class="page-link" href="/api">API Docs</a>
+        <a class="page-link" href="/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Running Clusternator On OS X</h1>
+  </header>
+
+  <div class="post-content">
+    <h2 id="os-x-requirements">OS X Requirements</h2>
+
+<ul>
+  <li>nodejs</li>
+  <li>gpg</li>
+  <li>docker (optional)</li>
+</ul>
+
+<h2 id="nodejs">nodejs</h2>
+
+<p>There are a number of ways to install node on OS X.  Brew users can simply</p>
+
+<p><code class="highlighter-rouge">
+brew install nodejs
+</code></p>
+
+<p>Node can also be installed manually by using the <a href="https://nodejs.org/en/download/" title="Node JS Downloads">installer</a></p>
+
+<p>Node’s source can also be <a href="https://nodejs.org/en/download/" title="Node JS Downloads">downloaded</a> and built.  Building node is
+beyond the scope of this document.</p>
+
+<h2 id="gpg---gnu-privacy-guard">gpg - GNU Privacy Guard</h2>
+
+<p>There are a number of ways to install gpg on OS X.  Brew users can simply</p>
+
+<p><code class="highlighter-rouge">
+brew install gpg
+</code></p>
+
+<p>GPG can also be manually installed by <a href="http://macgpg.sourceforge.net/" title="Mac GPG">visiting macgpg</a></p>
+
+<p>GPG’s source can also be <a href="http://macgpg.sourceforge.net/" title="Mac GPG">downloaded</a> and built.  Building gpg is beyond
+the scope of this document.</p>
+
+<h2 id="docker-optional">Docker (Optional)</h2>
+
+<p>Dev’s using clusternator only need to install Docker if they plan on working
+with Docker containers on their local system.  In many cases this may not be
+necessary.</p>
+
+<p>Best practice is to install <a href="https://www.docker.com/docker-toolbox" title="Docker Toolbox download">the latest</a> version of docker, as opposed
+to using a package manager like Brew.  The installer is just as straightforward
+as any other mainstream installer.</p>
+
+<p>Docker for OS X will also install <em>Virtual Box</em>, because Docker only works with
+the Linux kernel.</p>
+
+<p>Once Docker is downloaded, and installed, run it, and it will create its initial
+environment/virtual machine.</p>
+
+<h3 id="finding-your-docker-vms-ip">Finding Your Docker VM’s IP</h3>
+
+<p>Docker containers run in a GNU/Linux virtual machine.  Docker services are
+served <em>from</em> this machine, <em>not</em> the developer’s localhost.  This means that in
+order to actually use a local Docker service the developer will need to
+determine the IP address of their virtual machine.</p>
+
+<p>To find the IP, run from the CLI/Bash:</p>
+
+<p><code class="highlighter-rouge">
+docker-machine ls
+</code></p>
+
+<p>This will list all the Docker virtual machines (not to be confused with
+containers) running on the local system.  Output might look something like:</p>
+
+<p><code class="highlighter-rouge">
+NAME      ACTIVE   DRIVER       STATE     URL                         SWARM
+default   *        virtualbox   Running   tcp://192.168.99.100:2376
+</code></p>
+
+<p>Given the above output, Docker instances will be found at <code class="highlighter-rouge">192.168.99.100</code>, and
+the port/protocol will depend on the services that particular container is
+running, and how its ports have been mapped.</p>
+
+<h3 id="starting-docker-after-reboot">Starting Docker After Reboot</h3>
+
+<p>Docker for OS X depends on some environment variables being set, this process is
+mostly automatic.</p>
+
+<p>To get Docker working after reboot:</p>
+
+<ul>
+  <li>Run “Docker Quick Start Terminal” OS X app</li>
+  <li>In a CLI/Bash run</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+docker-machine env defaul &amp;&amp; \
+eval "$(docker-machine env default)"
+</code></p>
+
+<h4 id="whenif-things-go-wrong-like-a-network-change">When/If Things Go Wrong (like a network change)</h4>
+
+<p>Sometimes things do not go as planned.  Sometimes, like when a network changes,
+or when a laptop sleeps, OS X’s docker environment has issues.  These often
+manifest as “network errors”.</p>
+
+<p>Fortunately Max OS X’s Docker environment is virtual, and can be <em>completely</em> 
+reset:</p>
+
+<p><code class="highlighter-rouge">
+killall -9 VBoxHeadless &amp;&amp; docker-machine restart default 
+</code>
+followed by</p>
+
+<p><code class="highlighter-rouge">
+docker-machine env default &amp;&amp; eval "$(docker-machine env default)" 
+</code></p>
+
+<p>It’s possible these can be combined into a one liner, but that does not
+translate nicely into markdown.</p>
+
+<h4 id="stopping-docker">Stopping Docker</h4>
+
+<p>Sometimes the reader will want to completely stop Docker, and free up resources</p>
+
+<ul>
+  <li>Open <em>Virtual Box</em> application</li>
+  <li>Stop/Power off the default VM.  This should be the only VM unless the reader
+uses <em>Virtual Box</em> for their own purposes</li>
+</ul>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">The Clusternator Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-3">
+        <p>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+
+          The Clusternator uses the
+          <span><a href="/LICENSE">MIT License</a></span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
