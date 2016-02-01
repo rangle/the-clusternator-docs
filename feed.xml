@@ -4,23 +4,23 @@
     <title>The Clusternator Documentation</title>
     <description>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon&#39;s AWS cloud service.
 </description>
-    <link>http://the-clusternator.rangle.io/the-clusternator/</link>
-    <atom:link href="http://the-clusternator.rangle.io/the-clusternator/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 01 Feb 2016 08:34:29 -0500</pubDate>
-    <lastBuildDate>Mon, 01 Feb 2016 08:34:29 -0500</lastBuildDate>
+    <link>http://the-clusternator.rangle.io/</link>
+    <atom:link href="http://the-clusternator.rangle.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 01 Feb 2016 08:40:18 -0500</pubDate>
+    <lastBuildDate>Mon, 01 Feb 2016 08:40:18 -0500</lastBuildDate>
     <generator>Jekyll v3.1.1</generator>
     
       <item>
         <title>Hello World</title>
         <description>&lt;p&gt;The Clusternator now has a blog. This blog is part of the documentation
 project.  This site will also serve to host the documentation for The 
-Clusternator.  There is primitive &lt;a href=&quot;/the-clusternator/api/&quot; title=&quot;Clusternator API&quot;&gt;API Documentation&lt;/a&gt; that is auto
+Clusternator.  There is primitive &lt;a href=&quot;/api/&quot; title=&quot;Clusternator API&quot;&gt;API Documentation&lt;/a&gt; that is auto
 generated on prepublish.&lt;/p&gt;
 
 </description>
         <pubDate>Sat, 30 Jan 2016 22:45:15 -0500</pubDate>
-        <link>http://the-clusternator.rangle.io/the-clusternator/blog/2016/01/30/hello-world.html</link>
-        <guid isPermaLink="true">http://the-clusternator.rangle.io/the-clusternator/blog/2016/01/30/hello-world.html</guid>
+        <link>http://the-clusternator.rangle.io/blog/2016/01/30/hello-world.html</link>
+        <guid isPermaLink="true">http://the-clusternator.rangle.io/blog/2016/01/30/hello-world.html</guid>
         
         
         <category>blog</category>
