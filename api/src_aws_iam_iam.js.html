@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/aws/iam/iam.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link rel="stylesheet" href="/the-clusternator/css/jsdoc.css">
+    <link rel="stylesheet" href="/the-clusternator/css/main.css">
+<link rel="canonical" href="/the-clusternator/api/src_aws_iam_iam.js.html">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/the-clusternator/feed.xml">
+
+</head>
+<body>
+
+<header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/the-clusternator/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/the-clusternator/guide">Guide</a>
+        <a class="page-link" href="/the-clusternator/api">API Docs</a>
+        <a class="page-link" href="/the-clusternator/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+
+<div class="page-content">
+  <div class="wrapper">
+    <article id="main">
+      <header class="post-header">
+        <h1 class="post-title">Source: src/aws/iam/iam.js</h1>
+      </header>
+
+      <div class="post-content">
+        
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+/**
+ * Interface to AWS IAM wrappers
+ *
+ * @module aws/iam
+ */
+
+const Q = require('q');
+const policies = { ecr: require('./ecr-policies') }
+const constants = require('../../constants');
+const common = require('../common');
+const rid = require('../../resource-identifier');
+const ECR_USER_TAG = 'ecr-user';
+const ECR_GENERAL_TAG = 'ecr-general';
+
+module.exports = {
+  listServerCertificates,    // filtered for clusternator
+  listAllServerCertificates, // _everything_ (analogue to aws.iam.listServer...)
+  deleteServerCertificate,
+  uploadServerCertificate,
+  createUser,
+  createProjectUser,
+  destroyProjectUser,
+  destroyUser,
+  createPolicy,
+  createEcrPolicies,
+  createEcrUserPolicy,
+  createEcrGeneralPolicy,
+  ecrGeneralPolicyArn,
+  ecrUserPolicyArn,
+  destroyPolicy,
+  attachPolicy,
+  detachPolicy,
+  describeUsers,
+  describeUser,
+  describePolicy,
+  describePolicies,
+  policyArn,
+  policyArns,
+  describeAccessKeys,
+  reCreateAccessKey,
+  createAccessKey,
+  destroyAccessKeys,
+  describeAccessKey
+};
+
+function describeAccessKey(aws, name) {
+  return describeAccessKeys(aws, name)
+    .then((result) => {
+      if (result[0]) {
+        return result[0];
+      }
+      throw new Error(`IAM: describeAccessKey: ${name} not found`);
+    });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} projectId
+ * @param {string} registryArn
+ * @returns {Request|Promise.&lt;T>|*}
+ */
+function createProjectUser(aws, projectId, registryArn) {
+  return Q.all([
+    createUser(aws, projectId),
+    createEcrPolicies(aws, projectId, registryArn,
+      `Clusternator created for ${projectId}`) ])
+    .then((results) => Q
+      .all([
+        attachPolicy(aws, results[1][0].Arn, projectId),
+        attachPolicy(aws, results[1][1].Arn, projectId) ])
+      .then(() => reCreateAccessKey(aws, projectId)));
+}
+
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} projectId
+ * @returns {Request}
+ */
+function destroyProjectUser(aws, projectId) {
+  return policyArns(aws, projectId)
+    .then((arns) => Q
+      .all(arns.map((arn) => detachPolicy(aws, arn, projectId)))
+      .then(() => Q
+        .all(arns.map((arn) => destroyPolicy(aws, arn)))))
+    .then(() => destroyAccessKeys(aws, projectId))
+    .then(() => destroyUser(aws, projectId));
+}
+
+/**
+ * @param aws
+ * @param name
+ * @returns {Q.Promise&lt;Object>}
+ */
+function describeAccessKeys(aws, name) {
+  name = rid.clusternatePrefixString(name);
+  return aws.iam.listAccessKeys({
+      UserName: name})
+    .then((desc) => {
+      const result = desc.AccessKeyMetadata;
+      if (result.length) {
+        return result;
+      }
+      throw new Error(`IAM: No keys found for [name] `);
+    });
+}
+
+function reCreateAccessKey(aws, name) {
+  return destroyAccessKeys(aws, name)
+  .then(() => createAccessKey(aws, name), () => createAccessKey(aws, name));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise&lt;Object>}
+ * @throws {TypeError}
+ */
+function createAccessKey(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: createAccessKey requires user name');
+  }
+  name = rid.clusternatePrefixString(name);
+  return describeAccessKeys(aws, name)
+    .then(() => {
+      throw new Error(`IAM ${name} already has a key: Try recreate`);
+    }, () => aws.iam.createAccessKey({
+        UserName: name })
+      .then((result) => result.AccessKey));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function destroyAccessKeys(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: createAccessKey requires a name');
+  }
+  name = rid.clusternatePrefixString(name);
+  return describeAccessKeys(aws, name)
+  .then((keys) => Q
+    .all(keys.map((kDesc) => aws.iam
+      .deleteAccessKey({
+        UserName: name,
+        AccessKeyId:  kDesc.AccessKeyId}))));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} policyArn
+ * @param {string} userName
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function attachPolicy(aws, policyArn, userName) {
+  if (!userName || !policyArn) {
+    throw new TypeError('IAM: attachPolicy requires policyArn, and userName');
+  }
+  userName = rid.clusternatePrefixString(userName);
+  return aws.iam.attachUserPolicy({
+    PolicyArn: policyArn,
+    UserName: userName
+  });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} policyArn
+ * @param {string} userName
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function detachPolicy(aws, policyArn, userName) {
+  if (!userName || !policyArn) {
+    throw new TypeError('IAM: attachPolicy requires policyArn, and userName');
+  }
+  userName = rid.clusternatePrefixString(userName);
+  return aws.iam.detachUserPolicy({
+    PolicyArn: policyArn,
+    UserName: userName
+  });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @param {string} policy
+ * @param {string} description
+ * @returns {Q.Promise}
+ */
+function createPolicy(aws, name, policy, description) {
+  if (!name || !policy) {
+    throw new TypeError('IAM: createUser requires a name, and policy document');
+  }
+  name = rid.clusternatePrefixString(name);
+  description = description || 'Clusternator Policy';
+  return aws.iam.createPolicy({
+      PolicyName: name,
+      PolicyDocument: policy,
+      Description: description})
+    .then((r) => r.Policy)
+    .fail((err) => describePolicy(aws, name)
+      .fail(() => {throw err;}));
+}
+
+function createEcrUserPolicyName(name) {
+  return name + '-' + ECR_USER_TAG;
+}
+
+function createEcrGeneralPolicyName(name) {
+  return name + '-' + ECR_GENERAL_TAG;
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @param {string} registryArn
+ * @param {string=} description
+ * @returns {Q.Promise}
+ */
+function createEcrUserPolicy(aws, name, registryArn, description) {
+  return createPolicy(aws, createEcrUserPolicyName(name),
+    policies.ecr.user(registryArn), description);
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @param {string=} description
+ * @returns {Q.Promise}
+ */
+function createEcrGeneralPolicy(aws, name,  description) {
+  return createPolicy(aws, createEcrGeneralPolicyName(name),
+    policies.ecr.general(), description);
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @param {string} registryArn
+ * @param {string=} description
+ * @returns {Q.Promise}
+ */
+function createEcrPolicies(aws, name, registryArn, description) {
+  return Q.all([
+    createEcrGeneralPolicy(aws, name, description),
+    createEcrUserPolicy(aws, name, registryArn, description)
+  ]);
+}
+
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} arn
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function destroyPolicy(aws, arn) {
+  if (!arn) {
+    throw new TypeError('IAM: destroy policy requires arn');
+  }
+  return aws.iam
+    .deletePolicy({
+      PolicyArn: arn })
+    .fail((err) => describePolicy(aws, arn)
+      // if the policy doesn't exist, that's fine with us
+      .then(() => { throw err; }, () => null));
+}
+
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function createUser(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: createUser requires name');
+  }
+  name = rid.clusternatePrefixString(name);
+  return aws.iam.createUser({
+    UserName: name
+  }).fail(() => describeUser(aws, name));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function destroyUser(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: createUser requires name');
+  }
+  name = rid.clusternatePrefixString(name);
+  return aws.iam.deleteUser({
+      UserName: name })
+    .fail((err) => describeUser(aws, name)
+       // if the user doesn't exist, we don't care
+      .then(() => { throw err; }, () => null));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @returns {Q.Promise&lt;Object[]>}
+ */
+function describePolicies(aws) {
+  return aws.iam
+    .listPolicies()
+    .then((results) => results
+      .Policies.filter((policy) => rid
+        .isPrefixed(policy.PolicyName)));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise&lt;Object>}
+ * @throws {TypeError}
+ */
+function describePolicy(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: describePolicy requires a name');
+  }
+  return describePolicies(aws)
+    .then((policies) => {
+      const result = filterByName(policies, 'PolicyName', rid
+        .clusternatePrefixString(name));
+      if (result[0]) {
+        return result[0];
+      }
+      throw new Error(`IAM: Policy ${name} not found`);
+    });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise&lt;string>}
+ */
+function policyArn(aws, name) {
+  return describePolicy(aws, name)
+    .then((desc) => desc.Arn);
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} prefix
+ * @returns {Q.Promise&lt;string[]>}
+ * @throw {TypeError}
+ */
+function policyArns(aws, prefix) {
+  if (!prefix) {
+    throw new TypeError('IAM: policyArns requires a prefix');
+  }
+  prefix = rid.clusternatePrefixString(prefix);
+  return describePolicies(aws)
+    .then((desc) => desc
+      .filter((d) => d.PolicyName.indexOf(prefix) === 0)
+      .map((d) => d.Arn));
+}
+
+function ecrGeneralPolicyArn(aws, name) {
+  return policyArn(aws, createEcrGeneralPolicyName(name));
+}
+
+function ecrUserPolicyArn(aws, name) {
+  return policyArn(aws, createEcrUserPolicyName(name));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @returns {Q.Promise&lt;Object[]>}
+ */
+function describeUsers(aws) {
+  return aws.iam
+    .listUsers()
+    .then((results) => results
+      .Users.filter((user) => rid
+        .isPrefixed(user.UserName)));
+}
+
+/**
+ * @param {Array} coll
+ * @param {string} attr
+ * @param {string} name
+ * @returns {*}
+ */
+function filterByName(coll, attr, name) {
+  return coll.filter((item) => item[attr] === name );
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} name
+ * @returns {Q.Promise&lt;Object>}
+ * @throws {TypeError}
+ */
+function describeUser(aws, name) {
+  if (!name) {
+    throw new TypeError('IAM: describeUser requires a name');
+  }
+  return describeUsers(aws)
+    .then((users) => {
+     const result = filterByName(users, 'UserName', rid
+        .clusternatePrefixString(name));
+      if (result[0]) {
+        return result[0];
+      }
+      throw new Error(`IAM: describeUser: ${name} not found`);
+    });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} certificate
+ * @param {string} privateKey
+ * @param {string=} chain
+ * @param {string=} certId
+ * @returns {Q.Promise}
+ */
+function uploadServerCertificate(aws, certificate, privateKey, chain, certId) {
+  if (!certificate || !privateKey) {
+    throw new TypeError('uploadSererCertificate expects cert, and private key');
+  }
+  certId = certId ||
+    `${constants.CLUSTERNATOR_PREFIX}-${(+Date.now()).toString(16)}`;
+  chain = chain || '';
+  certId = rid.clusternatePrefixString(certId);
+  return aws.iam.uploadServerCertificate({
+    CertificateBody: certificate,
+    PrivateKey: privateKey,
+    CertificateChain: chain,
+    ServerCertificateName: certId
+  });
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} certId
+ * @returns {Q.Promise}
+ * @throws {TypeError}
+ */
+function deleteServerCertificate(aws, certId) {
+  if (!certId) {
+    throw new TypeError('deleteServerCertificate requires a certId');
+  }
+  return aws.iam.deleteServerCertificate({ ServerCertificateName: certId });
+}
+
+/**
+ * @param {{ ServerCertificateName: string }} item
+ * @returns {boolean}
+ */
+function filterClusternatorTag(item) {
+  return rid.isPrefixed(item.ServerCertificateName);
+}
+
+/**
+ * @param {{ ServerCertificateName: string, ServerCertificateId: string,
+ Arn: string}} item
+ * @returns {{certId: (string|*), awsId: *, arn: *}}
+ */
+function mapCertificateToSimple(item) {
+  return {
+    certId: item.ServerCertificateName,
+    awsId: item.ServerCertificateId,
+    arn: item.Arn
+  };
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @returns {Q.Promise}
+ */
+function listAllServerCertificates(aws) {
+  return aws.iam
+    .listServerCertificates()
+    .then((results) => results
+      .ServerCertificateMetadataList
+      .map(mapCertificateToSimple));
+}
+
+/**
+ * @param {AwsWrapper} aws
+ * @returns {Q.Promise}
+ */
+function listServerCertificates(aws) {
+  return aws.iam
+    .listServerCertificates()
+    .then((results) => results
+      .ServerCertificateMetadataList
+      .filter(filterClusternatorTag)
+      .map(mapCertificateToSimple));
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+      </div>
+
+    </article>
+  </div>
+</div>
+<nav class="jsdoc-nav" id="jsdoc-nav">
+  <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-api__0.1__cli.html">api/'0.1'/cli</a></li><li><a href="module-api__0.1__cli_cloudService.html">api/'0.1'/cli/cloudService</a></li><li><a href="module-api__0.1__cli_legacYargs.html">api/'0.1'/cli/legacYargs</a></li><li><a href="module-api__0.1__cli_legacyCli.html">api/'0.1'/cli/legacyCli</a></li><li><a href="module-api__0.1__cli_log-ssh.html">api/'0.1'/cli/log-ssh</a></li><li><a href="module-api__0.1__cli_project.html">api/'0.1'/cli/project</a></li><li><a href="module-api__0.1__cli_projectDb.html">api/'0.1'/cli/projectDb</a></li><li><a href="module-api__0.1__cli_stdioInheritors.html">api/'0.1'/cli/stdioInheritors</a></li><li><a href="module-api__0.1__clusternator.html">api/'0.1'/clusternator</a></li><li><a href="module-api__0.1__common.html">api/'0.1'/common</a></li><li><a href="module-api__0.1__projectFs_circleCi.html">api/'0.1'/projectFs/circleCi</a></li><li><a href="module-api__0.1__projectFs_clusternatorJson.html">api/'0.1'/projectFs/clusternatorJson</a></li><li><a href="module-api__0.1__projectFs_clusternatorScripts.html">api/'0.1'/projectFs/clusternatorScripts</a></li><li><a href="module-api__0.1__projectFs_deployments.html">api/'0.1'/projectFs/deployments</a></li><li><a href="module-api__0.1__projectFs_docker.html">api/'0.1'/projectFs/docker</a></li><li><a href="module-api__0.1__projectFs_gitHooks.html">api/'0.1'/projectFs/gitHooks</a></li><li><a href="module-api__0.1__projectFs_init.html">api/'0.1'/projectFs/init</a></li><li><a href="module-api__0.1__projectFs_private.html">api/'0.1'/projectFs/private</a></li><li><a href="module-api__0.1__projectFs_projectFs.html">api/'0.1'/projectFs/projectFs</a></li><li><a href="module-api__0.1__rest.html">api/'0.1'/rest</a></li><li><a href="module-aws_aclManager.html">aws/aclManager</a></li><li><a href="module-aws_aws.html">aws/aws</a></li><li><a href="module-aws_clusterManager.html">aws/clusterManager</a></li><li><a href="module-aws_common.html">aws/common</a></li><li><a href="module-aws_deploymentManager.html">aws/deploymentManager</a></li><li><a href="module-aws_dynamoManager.html">aws/dynamoManager</a></li><li><a href="module-aws_ec2_filter.html">aws/ec2/filter</a></li><li><a href="module-aws_ec2_sg_groups.html">aws/ec2/sg/groups</a></li><li><a href="module-aws_ec2_sg_idGroupPair.html">aws/ec2/sg/idGroupPair</a></li><li><a href="module-aws_ec2_sg_ipPermissions.html">aws/ec2/sg/ipPermissions</a></li><li><a href="module-aws_ec2_sg_ipRange.html">aws/ec2/sg/ipRange</a></li><li><a href="module-aws_ec2_tag.html">aws/ec2/tag</a></li><li><a href="module-aws_ec2Manager.html">aws/ec2Manager</a></li><li><a href="module-aws_ec2Skeletons.html">aws/ec2Skeletons</a></li><li><a href="module-aws_ecr.html">aws/ecr</a></li><li><a href="module-aws_elb.html">aws/elb</a></li><li><a href="module-aws_elb_portListener.html">aws/elb/portListener</a></li><li><a href="module-aws_elb_tag.html">aws/elb/tag</a></li><li><a href="module-aws_iam.html">aws/iam</a></li><li><a href="module-aws_iam_ecrPolicies.html">aws/iam/ecrPolicies</a></li><li><a href="module-aws_instanceReaper.html">aws/instanceReaper</a></li><li><a href="module-aws_prManager.html">aws/prManager</a></li><li><a href="module-aws_projectInit.html">aws/projectInit</a></li><li><a href="module-aws_projectManager.html">aws/projectManager</a></li><li><a href="module-aws_route53Manager.html">aws/route53Manager</a></li><li><a href="module-aws_route53Skeletons.html">aws/route53Skeletons</a></li><li><a href="module-aws_routeTableManager.html">aws/routeTableManager</a></li><li><a href="module-aws_securityGroupManager.html">aws/securityGroupManager</a></li><li><a href="module-aws_subnetManager.html">aws/subnetManager</a></li><li><a href="module-aws_taskDefinitionManager.html">aws/taskDefinitionManager</a></li><li><a href="module-aws_taskServiceManager.html">aws/taskServiceManager</a></li><li><a href="module-aws_vpcManager.html">aws/vpcManager</a></li><li><a href="module-childProcess.html">childProcess</a></li><li><a href="module-childProcess_docker.html">childProcess/docker</a></li><li><a href="module-childProcess_git.html">childProcess/git</a></li><li><a href="module-childProcess_gpg.html">childProcess/gpg</a></li><li><a href="module-childProcess_logs.html">childProcess/logs</a></li><li><a href="module-childProcess_npm.html">childProcess/npm</a></li><li><a href="module-childProcess_privateSha.html">childProcess/privateSha</a></li><li><a href="module-childProcess_slack.html">childProcess/slack</a></li><li><a href="module-childProcess_ssh.html">childProcess/ssh</a></li><li><a href="module-childProcess_ssh-keygen.html">childProcess/ssh-keygen</a></li><li><a href="module-childProcess_tar.html">childProcess/tar</a></li><li><a href="module-circleCIClient.html">circleCIClient</a></li><li><a href="module-clusternator.html">clusternator</a></li><li><a href="module-clusternator_common.html">clusternator/common</a></li><li><a href="module-clusternator_projectData.html">clusternator/projectData</a></li><li><a href="module-clusternator_projectManager.html">clusternator/projectManager</a></li><li><a href="module-clusternator_user.html">clusternator/user</a></li><li><a href="module-clusternatorCli.html">clusternatorCli</a></li><li><a href="module-Config.html">Config</a></li><li><a href="module-constants.html">constants</a></li><li><a href="module-dockernate.html">dockernate</a></li><li><a href="module-resourceIdentifier.html">resourceIdentifier</a></li><li><a href="module-server.html">server</a></li><li><a href="module-server__api-0.1_.html">server/'api-0.1'</a></li><li><a href="module-server_authentication.html">server/authentication</a></li><li><a href="module-server_authorities.html">server/authorities</a></li><li><a href="module-server_cryptoHash.html">server/cryptoHash</a></li><li><a href="module-server_cryptoSymmetric.html">server/cryptoSymmetric</a></li><li><a href="module-server_db_projects.html">server/db/projects</a></li><li><a href="module-server_gitHubHook.html">server/gitHubHook</a></li><li><a href="module-server_gitHubPullRequest.html">server/gitHubPullRequest</a></li><li><a href="module-server_gitHubPush.html">server/gitHubPush</a></li><li><a href="module-server_loggers.html">server/loggers</a></li><li><a href="module-server_passwords.html">server/passwords</a></li><li><a href="module-server_tokens.html">server/tokens</a></li><li><a href="module-server_users.html">server/users</a></li><li><a href="module-server_util.html">server/util</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="module-aws_aws-AwsWrapper.AwsWrapper.html">AwsWrapper</a></li><li><a href="module-aws_ec2_filter-Filter.Filter.html">Filter</a></li><li><a href="module-aws_ec2_sg_idGroupPair-SgUserIdGroupPair.SgUserIdGroupPair.html">SgUserIdGroupPair</a></li><li><a href="module-aws_ec2_sg_ipPermissions-SgIpPermissions.SgIpPermissions.html">SgIpPermissions</a></li><li><a href="module-aws_ec2_sg_ipRange-SgIpRange.SgIpRange.html">SgIpRange</a></li><li><a href="module-aws_ec2_tag-Ec2Tag.Ec2Tag.html">Ec2Tag</a></li><li><a href="module-aws_elb_portListener-ElbPortListener.ElbPortListener.html">ElbPortListener</a></li><li><a href="module-aws_elb_tag-ElbTag.ElbTag.html">ElbTag</a></li></ul>
+</nav>
+<h2 class="toggle-nav" id="toggle-nav" onclick="toggleVisibility('jsdoc-nav')">Docs</h2>
+<script type="text/javascript">
+    function setToggleNav(char) {
+      var e = document.getElementById('toggle-nav');
+      e.innerHTML = char;
+     }
+    function toggleVisibility(id, doInit) {
+       var e = document.getElementById(id);
+       if(e.style.display == 'block') {
+          setToggleNav('<');
+          e.style.display = 'none';
+       } else {
+          setToggleNav('>');
+          e.style.display = 'block';
+       }
+    }
+</script>
+
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Feb 01 2016 08:31:05 GMT-0500 (EST)
+</footer>
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+
+
+<br class="clear">
+
+</body>
+
+</html>
