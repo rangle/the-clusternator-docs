@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>User Management</title>
+  <meta name="description" content="The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+<link rel="canonical" href="/guide/admin/user-management">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/guide">Guide</a>
+        <a class="page-link" href="/api">API Docs</a>
+        <a class="page-link" href="/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">User Management</h1>
+  </header>
+
+  <div class="post-content">
+    <i><a href="../admin" title="Administrator's Guide">Administrator's Guide</a></i>
+    <p>The Clusternator server sits between the developer (client) and a cloud service
+provider like Amazon’s AWS.</p>
+
+<p>In order for The Clusternator to assemble deployments it requires a number of 
+permissions from the cloud service provider. Chances are that these permissions 
+are <em>too</em> permissive for many people working on a given project.</p>
+
+<p>By standing between the client and the cloud service provider, The Clusternator
+server limits what the end user can actually do with the cloud service provider.</p>
+
+<p>In order for this to work The Clusternator needs to know about users, how to 
+authenticate them, and what authority they have.  By default The Clusternator 
+starts with one user named <code class="highlighter-rouge">root</code>.  This user starts with a password provided 
+during the <a href="/guide/installation" title="Installation Guide"><code class="highlighter-rouge">bootstrap</code> step</a></p>
+
+<p>Each Clusternator user has an associated “Authority”.  This authority determines
+what the user can/cannot do with The Clusternator server.  The
+<a href="/guide/admin/authorities" title="Authorities Guide">authorities guide</a> has more
+information on authorities.</p>
+
+<p>Each Clusternator user also has a password, or at least a salted-hashed 
+password.  More information can be found in the 
+<a href="/guide/admin/authentication" title="Authentication Guide">authentication</a> section</p>
+
+<p>Using an admin account, Clusternator users can be created with:</p>
+
+<p><code class="highlighter-rouge">
+clusternator create-user
+</code></p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">The Clusternator Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-3">
+        <p>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+
+          The Clusternator uses the
+          <span><a href="/LICENSE">MIT License</a></span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
