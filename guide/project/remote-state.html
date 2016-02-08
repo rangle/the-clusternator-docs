@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Clusternator Server Project State</title>
+  <meta name="description" content="The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+<link rel="canonical" href="/guide/project/remote-state">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/guide">Guide</a>
+        <a class="page-link" href="/api">API Docs</a>
+        <a class="page-link" href="/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Clusternator Server Project State</h1>
+  </header>
+
+  <div class="post-content">
+    <i><a href="../project" title="Project Guide">Project Guide</a></i>
+    <p>There are two types of remote state that The Clusternator is aware of.</p>
+
+<ul>
+  <li>The actual state of virtual machines and containers used on a cloud service</li>
+  <li>Some data about a given project</li>
+</ul>
+
+<h2 id="project-data">Project Data</h2>
+
+<p>Project data consists of a few things required to make Clusternator deployments
+integrate with CI systems.  Each project has:</p>
+
+<ul>
+  <li>Shared Secret Key</li>
+  <li>Project access token</li>
+  <li>GitHub Key</li>
+</ul>
+
+<p>See <code class="highlighter-rouge">clusternator project --help</code> for more comamand information</p>
+
+<h3 id="shared-secret-key">Shared Secret Key</h3>
+
+<p>The shared secret key is used to decrypt/encrypt the contents of
+<a href="/guide/project/fs-private" title="Private Directory"><code class="highlighter-rouge">.private</code></a>.  This key is
+accessible to project team members transparently.  However they can manually
+ask for the key with <code class="highlighter-rouge">clusternator project shared-key</code> from somewhere within
+the project’s directory structure.</p>
+
+<p>The shared key can also be manually revoked, and re-issued with:
+<code class="highlighter-rouge">clusternator project reset-shared-key</code></p>
+
+<h3 id="project-authentication-token">Project Authentication Token</h3>
+
+<p>The project authentication token is only issued <em>once</em>, but can be revoked and 
+reissued on demand.</p>
+
+<p><code class="highlighter-rouge">clusternator init</code> will display the token at then end of a successful project
+init.</p>
+
+<p><code class="highlighter-rouge">clusternator project reset-auth-token</code> will revoke the old token, create a new
+token, and return it to the user</p>
+
+<p><code class="highlighter-rouge">clusternator project create-data</code> will reset <em>all</em> the project’s keys/tokens
+and display the new ones to the user</p>
+
+<p><em>note</em> The Clusternator is not capabale of storing an actual copy of this token
+so there is no way to view one on request, it can only be revoked/reissued.</p>
+
+<h3 id="github-key">GitHub Key</h3>
+
+<p>The GitHub key is used to encrypt/authenticate incoming requests from GitHub.
+The key is issued initially on <code class="highlighter-rouge">clusternator init</code> but can be manually reset
+with <code class="highlighter-rouge">clusternator project reset-git-hub-key</code>.  The key can be requested by
+a Clusternator user with  <code class="highlighter-rouge">clusternator project git-hub-key</code></p>
+
+<h2 id="virtual-resources-state">Virtual Resources State</h2>
+
+<p>Information specific to allocated resources are accessed by The Clusternator
+directly querying the underlying cloud service.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">The Clusternator Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-3">
+        <p>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+
+          The Clusternator uses the
+          <span><a href="/LICENSE">MIT License</a></span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
