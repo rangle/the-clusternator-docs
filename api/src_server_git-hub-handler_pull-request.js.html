@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: aws/aws</title>
+    <title>JSDoc: Source: src/server/git-hub-handler/pull-request.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -13,7 +13,7 @@
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link rel="stylesheet" href="/css/jsdoc.css">
     <link rel="stylesheet" href="/css/main.css">
-<link rel="canonical" href="/api/module-aws_aws.html">
+<link rel="canonical" href="/api/src_server_git-hub-handler_pull-request.js.html">
 <link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
 
 </head>
@@ -51,7 +51,7 @@
   <div class="wrapper">
     <article id="main">
       <header class="post-header">
-        <h1 class="post-title">Module: aws/aws</h1>
+        <h1 class="post-title">Source: src/server/git-hub-handler/pull-request.js</h1>
       </header>
 
       <div class="post-content">
@@ -59,128 +59,50 @@
 
 
 
-
-<section>
-
-<header>
     
-        
-            
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+/**
+ * Handler for GitHub pull request events
+ *
+ * @module server/gitHubPullRequest
+ */
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>This module assembles/builds all primitive AWS SDK objects needed to use this
-API, promisifies them, and locks them to a consistent version</p></div>
-        
+const R = require('ramda');
 
-        
-            
+let serverUtil = require('../util');
+const util = require('../../util');
+const log = require('../loggers').logger;
 
+function destroyPr(pm, projectId, prNum) {
+  return pm.destroyPR(projectId, prNum)
+    .then(() => log.info(`PR #${prNum} Destroyed for ${projectId}`))
+    .fail((err) => log.error(`PR #${prNum} Destruction failed on` +
+      `${projectId}: ${err.message}`));
+}
 
+function pullRequestRouteHandler(pm, req, res) {
+  const error = R.curry(serverUtil.sendError)(res);
 
+  util.info('PR Action: ', req.body.action);
+  const ghAction = req.body.action;
+  const projectId = res.locals.projectName;
+  const prNum = req.body.pull_request.number + '';
 
+  if(ghAction === 'closed') {
+    log.info(`Closing Pull Request ${projectId}`);
+    destroyPr(pm, projectId, prNum);
+    res.sendStatus(200);
+  } else {
+    error(405, `${ghAction} is not supported`);
+  }
+}
 
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_aws_aws.js.html">src/aws/aws.js</a>, <a href="src_aws_aws.js.html#line2">line 2</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-aws_aws-AwsWrapper.html">AwsWrapper</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+module.exports = pullRequestRouteHandler;
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -218,6 +140,7 @@ API, promisifies them, and locks them to a consistent version</p></div>
 </footer>
 <script> prettyPrint(); </script>
 <script src="scripts/linenumber.js"> </script>
+
 
 <br class="clear">
 

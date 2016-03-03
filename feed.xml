@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>The Clusternator Documentation</title>
-    <description>The Clustenator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon&#39;s AWS cloud service.
+    <description>The Clusternator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon&#39;s AWS cloud service.
 </description>
     <link>http://the-clusternator.rangle.io/</link>
     <atom:link href="http://the-clusternator.rangle.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 01 Mar 2016 08:10:08 -0500</pubDate>
-    <lastBuildDate>Tue, 01 Mar 2016 08:10:08 -0500</lastBuildDate>
+    <pubDate>Thu, 03 Mar 2016 15:17:36 -0500</pubDate>
+    <lastBuildDate>Thu, 03 Mar 2016 15:17:36 -0500</lastBuildDate>
     <generator>Jekyll v3.1.1</generator>
     
       <item>
