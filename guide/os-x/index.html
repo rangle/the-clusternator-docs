@@ -67,9 +67,9 @@
 
 <p>There are a number of ways to install node on OS X.  Brew users can simply</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>brew install nodejs
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">
+brew install nodejs
+</code></p>
 
 <p>Node can also be installed manually by using the <a href="https://nodejs.org/en/download/" title="Node JS Downloads">installer</a></p>
 
@@ -80,9 +80,9 @@ beyond the scope of this document.</p>
 
 <p>There are a number of ways to install gpg on OS X.  Brew users can simply</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>brew install gpg
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">
+brew install gpg
+</code></p>
 
 <p>GPG can also be manually installed by <a href="http://macgpg.sourceforge.net/" title="Mac GPG">visiting macgpg</a></p>
 
@@ -114,17 +114,17 @@ determine the IP address of their virtual machine.</p>
 
 <p>To find the IP, run from the CLI/Bash:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>docker-machine ls
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">
+docker-machine ls
+</code></p>
 
 <p>This will list all the Docker virtual machines (not to be confused with
 containers) running on the local system.  Output might look something like:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>NAME      ACTIVE   DRIVER       STATE     URL                         SWARM
+<p><code class="highlighter-rouge">
+NAME      ACTIVE   DRIVER       STATE     URL                         SWARM
 default   *        virtualbox   Running   tcp://192.168.99.100:2376
-</code></pre>
-</div>
+</code></p>
 
 <p>Given the above output, Docker instances will be found at <code class="highlighter-rouge">192.168.99.100</code>, and
 the port/protocol will depend on the services that particular container is
@@ -142,10 +142,10 @@ mostly automatic.</p>
   <li>In a CLI/Bash run</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>docker-machine env defaul &amp;&amp; \
+<p><code class="highlighter-rouge">
+docker-machine env defaul &amp;&amp; \
 eval "$(docker-machine env default)"
-</code></pre>
-</div>
+</code></p>
 
 <h4 id="whenif-things-go-wrong-like-a-network-change">When/If Things Go Wrong (like a network change)</h4>
 
@@ -156,14 +156,14 @@ manifest as “network errors”.</p>
 <p>Fortunately Max OS X’s Docker environment is virtual, and can be <em>completely</em> 
 reset:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>killall -9 VBoxHeadless &amp;&amp; docker-machine restart default 
-</code></pre>
-</div>
-<p>followed by</p>
+<p><code class="highlighter-rouge">
+killall -9 VBoxHeadless &amp;&amp; docker-machine restart default 
+</code>
+followed by</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>docker-machine env default &amp;&amp; eval "$(docker-machine env default)" 
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">
+docker-machine env default &amp;&amp; eval "$(docker-machine env default)" 
+</code></p>
 
 <p>It’s possible these can be combined into a one liner, but that does not
 translate nicely into markdown.</p>

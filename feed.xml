@@ -6,9 +6,9 @@
 </description>
     <link>http://the-clusternator.rangle.io/</link>
     <atom:link href="http://the-clusternator.rangle.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 17 Mar 2016 17:26:14 -0400</pubDate>
-    <lastBuildDate>Thu, 17 Mar 2016 17:26:14 -0400</lastBuildDate>
-    <generator>Jekyll v3.1.2</generator>
+    <pubDate>Thu, 17 Mar 2016 18:08:35 -0500</pubDate>
+    <lastBuildDate>Thu, 17 Mar 2016 18:08:35 -0500</lastBuildDate>
+    <generator>Jekyll v3.1.1</generator>
     
       <item>
         <title>Hello World</title>
@@ -18,7 +18,7 @@ Clusternator.  There is primitive &lt;a href=&quot;/api/&quot; title=&quot;Clust
 generated on prepublish.&lt;/p&gt;
 
 </description>
-        <pubDate>Sat, 30 Jan 2016 22:45:15 -0500</pubDate>
+        <pubDate>Sat, 30 Jan 2016 21:45:15 -0600</pubDate>
         <link>http://the-clusternator.rangle.io/blog/2016/01/30/hello-world.html</link>
         <guid isPermaLink="true">http://the-clusternator.rangle.io/blog/2016/01/30/hello-world.html</guid>
         
