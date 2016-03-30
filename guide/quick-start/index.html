@@ -63,36 +63,162 @@
 configured for your organization’s cloud.  This also assumes that your
 organization has a <em>private</em> GitHub repository for your project.</p>
 
+<h3 id="part-1-install-the-clusternator-command-line-interface-cli">Part 1: Install the Clusternator Command-Line Interface (CLI)</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>npm install -g clusternator
+</code></pre>
+</div>
+
+<h3 id="part-2-log-in-to-the-clusternator">Part 2: Log In to the Clusternator</h3>
+
+<p>You should have a Clusternator user name and password for your organization.
+If you don’t, get your Clusternator administrator to create an account for you.</p>
+
+<p>If you are the Clusternator admin, create accounts like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator create-user
+? Clusternator username clare
+? Authority User
+? New Password <span class="k">******************</span>
+? Please Confirm Your Password <span class="k">******************</span>
+</code></pre>
+</div>
+
+<p>For <code class="highlighter-rouge">authority</code> the choices are <code class="highlighter-rouge">Admin</code>, <code class="highlighter-rouge">User</code>, and <code class="highlighter-rouge">Project Lead</code>.  Typically
+you’ll want to select <code class="highlighter-rouge">User</code> to create an account with limited privileges.</p>
+
+<p>Give these credentials to the person who wants to use a clusternated project.</p>
+
+<p>Now that person can log in:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator login
+? Clusternator username clare
+? Password <span class="k">******************</span>
+Login Successful
+? Do you want to save this token <span class="k">for </span>future use? Yes
+</code></pre>
+</div>
+
+<p>Saving the token allows you to use the clusternator without having to re-login
+every time from this machine.</p>
+
+<p>If this is a new account given to you by your administrator, it’s recommended
+that you select a new password for yourself:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ clusternator passwd
+? Clusternator username clare
+? Password *****************
+? New Password ******************
+? Please Confirm Your Password ******************
+</code></pre>
+</div>
+
+<p>Note that you can logout from the clusternator at any time:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator <span class="nb">logout</span>
+</code></pre>
+</div>
+
+<h3 id="part-3-you-are-using-a-project-someone-else-has-already-clusternated">Part 3: You are using a project someone else has already clusternated</h3>
+
+<p>Great! you just need to <code class="highlighter-rouge">clusternator login</code> and get set up.</p>
+
+<p><strong>Clone the project:</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone ssh://git@github.com/my-organization/my-cool-project.git
+<span class="gp">$ </span><span class="nb">cd </span>my-cool-project
+</code></pre>
+</div>
+
+<p><strong>Decrypt the project’s deployment configuration:</strong></p>
+
+<p>Clusternator keeps any credentials, environment variables, and other deployment
+secrets for your project in an encrypted tarball that lives with the source code.</p>
+
+<p>In order to run locally you’ll need to decrypt it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator <span class="nb">read</span>-private -p <span class="k">$(</span>clusternator project shared-key<span class="k">)</span>
+info: Clusternator: Private files/directories un-encrypted
+</code></pre>
+</div>
+
+<p>This creates local folder called <code class="highlighter-rouge">.private</code> that contains your application’s
+deployment secrets.  <strong>Do not share this folder with anyone or commit it to
+git in unencrypted form</strong>.</p>
+
+<p>If you foresee a need to adjust anything in <code class="highlighter-rouge">.private</code>, then you should install
+the clusternator git hooks:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator git-hook-install
+</code></pre>
+</div>
+
+<p>If you change anything in the <code class="highlighter-rouge">.private</code> folder, the git hooks will re-encrypt
+the bundle and add it to your next commit.</p>
+
+<p>If you don’t like git hooks and prefer to do this manually, the commands are:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator make-private -p <span class="k">$(</span>clusternator shared-key<span class="k">)</span>
+<span class="gp">$ </span>clusternator private-diff
+<span class="gp">$ </span>git add clusternator.tar.gz.asc
+<span class="gp">$ </span>git add .clusternator/.private-checksum
+<span class="gp">$ </span>git commit
+</code></pre>
+</div>
+
+<p>You should now be able to run the project using</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator serve
+</code></pre>
+</div>
+
+<h3 id="part-4-you-are-clusternating-a-new-project">Part 4: You are clusternating a new project</h3>
+
+<p>Make sure the repo exists locally and in github.  <code class="highlighter-rouge">cd</code> to your local clone.</p>
+
+<p>Do a <code class="highlighter-rouge">clusternator login</code>.  Your admin will have needed to give you at least
+<code class="highlighter-rouge">Project Lead</code> privileges for this to work.</p>
+
+<p>Initialize the project and follow the prompts.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator init
+</code></pre>
+</div>
+
+<p>Follow the prompts
+If everything goes well there will be a <code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code>, and a
+<code class="highlighter-rouge">GITHUB_KEY</code>  provided at the end of the init.</p>
+
+<p>Turn on CircleCI for your project repo. In circle-CI’s project settings,
+<em>One</em> (1) environment variable needs to be added: <code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code>
+set it to the value you get from the <code class="highlighter-rouge">clusternator project shared-key</code> command.</p>
+
+<p>This gives circle CI the ability to build your project’s docker file from the
+code and the encrypted secrets bundle.</p>
+
+<p>Navigate to the <code class="highlighter-rouge">github.com/my-organization/my-cool-project.git</code> repository’s
+web interface</p>
+
 <ul>
-  <li><code class="highlighter-rouge">npm install -g clusternator</code></li>
-  <li><code class="highlighter-rouge">git clone ssh://git@github.com/my-organization/my-cool-project.git</code></li>
-  <li><code class="highlighter-rouge">cd my-cool-project</code></li>
-  <li><code class="highlighter-rouge">clusternator init</code></li>
-  <li>Follow the prompts</li>
-  <li>If everything goes well there will be a <code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code>, and a
-<code class="highlighter-rouge">GITHUB_KEY</code>  provided at the end of the init</li>
-  <li>Turn on CircleCI for <code class="highlighter-rouge">my-cool-project</code></li>
-  <li><em>One</em> (1) environment variables need to be added:
-    <ul>
-      <li><code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code> (from init)</li>
-    </ul>
-  </li>
-  <li>Navigate to the <code class="highlighter-rouge">github.com/my-organization/my-cool-project.git</code> repository’s
-web interface</li>
   <li>Click <code class="highlighter-rouge">settings</code></li>
   <li>On the left nav bar click <code class="highlighter-rouge">webhooks &amp; services</code>
     <ul>
       <li>In the payload URL field enter: https://the-clusternator.my-organization.com/0.1/github</li>
       <li>Leave the content type as JSON</li>
-      <li>Paste the login token in the “secret” field</li>
+      <li>enter the output of <code class="highlighter-rouge">clusternator project git-hub-key</code> in the <code class="highlighter-rouge">secret</code> field.</li>
       <li>Set “Which events would you like to trigger this webhook?” to “Everything”</li>
       <li>Click Add</li>
     </ul>
   </li>
 </ul>
 
-<p>That’s it the project will produce new deployments each time a pull request is
-issued.  The project will tear down those deployments when PR’s close.</p>
+<p>That’s it.</p>
+
+<p>The project will produce new deployments each time a pull request is
+issued.  The project will tear down those deployments when PRs close.</p>
+
+<p>When anything is merged to <code class="highlighter-rouge">master</code>, the master instance deployment will be
+updated with the latest code.</p>
 
   </div>
 

@@ -173,6 +173,169 @@
 
     
 
+    <h4 class="name" id="~cliErr"><span class="type-signature">(inner) </span>cliErr<span class="signature">(operationDescription, maps)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Intended to handle errors at the CLI level.</p>
+<p>Pretty-prints messages for specific error codes and decides whether to
+exit with 0 or 1.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>operationDescription</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Describes what's being done in the CLI.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">codeMap</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>error codes to messages.</p>
+<p>If codeMap is omitted, or doesn't match an actual error, error.message will
+be logged instead.</p>
+<p>Example:</p>
+<p>.fail(cliErr('Doing something with clusternator', {
+  ENOENT: { msg: 'something not found', code: 1 },
+  EACCES: { msg: 'no big deal' }
+}));</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line397">line 397</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="~cliLogger"><span class="type-signature">(inner) </span>cliLogger<span class="signature">(yargs)</span><span class="type-signature"></span></h4>
 
     
@@ -273,7 +436,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line240">line 240</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line241">line 241</a>
     </li></ul></dd>
     
 
@@ -411,7 +574,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line203">line 203</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line204">line 204</a>
     </li></ul></dd>
     
 
@@ -515,7 +678,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line71">line 71</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -646,7 +809,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line266">line 266</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line267">line 267</a>
     </li></ul></dd>
     
 
@@ -795,7 +958,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line101">line 101</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -895,7 +1058,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line92">line 92</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -1022,7 +1185,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line128">line 128</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -1126,7 +1289,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line64">line 64</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -1208,7 +1371,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line53">line 53</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -1448,7 +1611,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line221">line 221</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line222">line 222</a>
     </li></ul></dd>
     
 
@@ -1604,7 +1767,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line177">line 177</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line178">line 178</a>
     </li></ul></dd>
     
 
@@ -1749,7 +1912,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line46">line 46</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -1899,7 +2062,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line187">line 187</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line188">line 188</a>
     </li></ul></dd>
     
 
@@ -1952,7 +2115,7 @@
 
     
 
-    <h4 class="name" id="~makeRetryPromise"><span class="type-signature">(inner) </span>makeRetryPromise<span class="signature">(promiseReturningFunction, retryCount, delay<span class="signature-attributes">opt</span>, multiplier<span class="signature-attributes">opt</span>, failOn, label<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="~makeRetryPromiseFunction"><span class="type-signature">(inner) </span>makeRetryPromiseFunction<span class="signature">(promiseReturningFunction, retryCount, delay<span class="signature-attributes">opt</span>, multiplier<span class="signature-attributes">opt</span>, failOn, label<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
@@ -2219,7 +2382,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line335">line 335</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line336">line 336</a>
     </li></ul></dd>
     
 
@@ -2394,7 +2557,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line294">line 294</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line295">line 295</a>
     </li></ul></dd>
     
 
@@ -2492,7 +2655,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line110">line 110</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -2660,7 +2823,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line321">line 321</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line322">line 322</a>
     </li></ul></dd>
     
 
@@ -2809,7 +2972,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line120">line 120</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line121">line 121</a>
     </li></ul></dd>
     
 
@@ -2958,7 +3121,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line280">line 280</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -3061,7 +3224,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line78">line 78</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -3304,7 +3467,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line148">line 148</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -3404,7 +3567,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line85">line 85</a>
+        <a href="src_util.js.html">src/util.js</a>, <a href="src_util.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -3471,7 +3634,7 @@
 
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 17 2016 18:08:34 GMT-0500 (CDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 29 2016 21:25:19 GMT-0400 (EDT)
   <span><a href="/LICENSE">MIT License</a></span>
 </footer>
 <script> prettyPrint(); </script>
