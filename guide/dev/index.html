@@ -78,12 +78,12 @@ live edits on <code class="highlighter-rouge">http://localhost:4000</code></p>
 <h3 id="documentation-tasks">Documentation Tasks</h3>
 
 <ul>
-  <li><code class="highlighter-rouge">npm run doc</code> will build JSDOC files first, then Jekyll will build those, and 
+  <li><code class="highlighter-rouge">npm run doc</code> will build JSDOC files first, then Jekyll will build those, and
 other guides into a complete site</li>
-  <li><code class="highlighter-rouge">npm run doc-dev</code> runs a watcher and a Jekyll dev server.  This command will 
+  <li><code class="highlighter-rouge">npm run doc-dev</code> runs a watcher and a Jekyll dev server.  This command will
 rebuild JSDoc, and Jekyll on file system changes</li>
-  <li><code class="highlighter-rouge">npm run doc-publish</code> will build, and publish a copy of the docs site. This 
-requires permissions to [the documentation repo][docRepo], jekyll, and a modest 
+  <li><code class="highlighter-rouge">npm run doc-publish</code> will build, and publish a copy of the docs site. This
+requires permissions to [the documentation repo][docRepo], jekyll, and a modest
 amount of room in your <code class="highlighter-rouge">/tmp</code></li>
   <li><code class="highlighter-rouge">npm run doc-dev-serve</code> runs the Jekyll dev server, and is for <em>internal use</em></li>
   <li><code class="highlighter-rouge">npm run doc-api</code> builds JSDoc only, and is for <em>internal use</em></li>
@@ -123,6 +123,28 @@ to <code class="highlighter-rouge">gulp test-unit</code></p>
 <p>Code coverage can be found <em>after</em> tests are run, and is located in the
 (generated) <code class="highlighter-rouge">coverage</code> folder.  Coverage includes lcov, json, and html.</p>
 
+<h3 id="a-note-about-error-handling">A note about Error Handling</h3>
+
+<p>The main structure of the CLI starts with the <code class="highlighter-rouge">src/api/0.1/cli/cli-api.js</code>.
+This file has two responsibilities: argument parsing (with <code class="highlighter-rouge">yargs</code>) and results
+logging.</p>
+
+<p>It delegates to a bunch of promisified functions in other modules to do the
+actual work.  This means that errors in those functions should always ‘bubble
+up’ to <code class="highlighter-rouge">cli-api.js</code>, which should have a near-monopoly on the the use of <code class="highlighter-rouge">.fail</code>
+or <code class="highlighter-rouge">.catch</code>.</p>
+
+<p><code class="highlighter-rouge">cli-api.js</code> will then use <code class="highlighter-rouge">utils.cliErr</code> to print a stack trace for unknown
+errors, or the correct error message for known errors.  It does this by supplying
+a map from <code class="highlighter-rouge">error.code</code> to an error string and desired process exit code.</p>
+
+<p>So:</p>
+
+<ol>
+  <li>always associate a <code class="highlighter-rouge">.code</code> constant with any error you want handled, and</li>
+  <li>only call <code class="highlighter-rouge">promise.fail</code> or <code class="highlighter-rouge">promise.catch</code> in <code class="highlighter-rouge">src/api/0.1/cli/cli-api.js</code>
+unless you have a good reason to do otherwise.</li>
+</ol>
 
   </div>
 
