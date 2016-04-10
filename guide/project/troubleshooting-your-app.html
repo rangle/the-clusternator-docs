@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Troubleshooting Your App</title>
+  <meta name="description" content="The Clusternator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+<link rel="canonical" href="/guide/project/troubleshooting-your-app">
+<link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">The Clusternator Documentation</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link" href="/guide">Guide</a>
+        <a class="page-link" href="/api">API Docs</a>
+        <a class="page-link" href="/about">About</a>
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Troubleshooting Your App</h1>
+  </header>
+
+  <div class="post-content">
+    <i><a href="../project" title="Project Guide">Project Guide</a></i>
+    <p>Sometimes, you’ll deploy your app, navigate to its URL, and it’s just not running right.
+Fortunately, the Clusternator gives you some tools to help you troubleshoot.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">clusternator log</code></li>
+  <li><code class="highlighter-rouge">clusternator ssh</code></li>
+</ul>
+
+<p>Using these commands will require some one-time setup on your part.</p>
+
+<h2 id="get-set-up">Get set up</h2>
+
+<p>Both of these tools require you to set up your machine to connect to your running app
+over SSH.  Clusternator makes it easy to wrangle your SSH keys to the right place.</p>
+
+<h3 id="add-an-ssh-public-key-to-your-app">Add an SSH public key to your app</h3>
+
+<p>Run the following command:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator generate-ssh-key -n key-name
+</code></pre>
+</div>
+
+<p>This will ask you some questions and then generate two files:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">.private/ssh-public/key-name.pub</code></li>
+  <li><code class="highlighter-rouge">~/.ssh/key-name</code></li>
+</ul>
+
+<p>The first file is the public ssh key that will eventually end up inside your app’s containers.</p>
+
+<p>The second file is the private key that should only reside on your local machine; this is your
+ssh authentication credential and <em>should not be shared with anyone</em>.</p>
+
+<p>It should however be added to your local machine’s <code class="highlighter-rouge">ssh-agent</code> by running the following command:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>ssh-add ~/.ssh/key-name
+</code></pre>
+</div>
+
+<h3 id="deploy-the-updated-keys">Deploy the updated keys</h3>
+
+<p>You can now deploy the public key to your app.  This is done by pushing the encrypted <code class="highlighter-rouge">.private</code>
+bundle up to github and letting circle-ci deploy it onto your application’s machine.</p>
+
+<p>Run the following commands:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator make-private -p <span class="k">$(</span>clusternator project shared-key<span class="k">)</span>
+<span class="gp">$ </span>clusternator private-checksum
+<span class="gp">$ </span>git commit -am <span class="s1">'Deploying ssh key'</span>
+<span class="gp">$ </span>git push
+</code></pre>
+</div>
+
+<p>Then wait for circle-ci to do its thing.</p>
+
+<h2 id="tailing-your-apps-logs">Tailing your app’s logs</h2>
+
+<p>Once the setup above has been completed, you’ll be able to see any output from your app
+in real time.</p>
+
+<p>Simply run <code class="highlighter-rouge">clusternator log</code> as follows:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator log
+? Choose a Box to Log <span class="o">(</span>Use arrow keys<span class="o">)</span>
+❯ Deployment master <span class="o">(</span>52.87.179.218/running<span class="o">)</span>
+</code></pre>
+</div>
+
+<p>The clusternator will prompt you for the specific instance whose logs you’d like to view.
+This is especially handy if you have a number of PRs and other deployments in your CI
+pipeline.</p>
+
+<h2 id="connecting-to-your-apps-instance">Connecting to your app’s instance</h2>
+
+<p>Sometimes you need more sophisticated troubleshooting capabilities. Clusternator makes is easy
+to locate your apps instances and connect to the with <code class="highlighter-rouge">ssh</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator ssh                                                                              Fri  8 Apr 2016 12:20:40 EDT
+? Choose a Box to Log Deployment master <span class="o">(</span>52.87.179.218/running<span class="o">)</span>
+Last login: Thu Apr  7 22:01:10 2016 from 75.98.192.82
+
+   __|  __|  __|
+   _|  <span class="o">(</span>   <span class="se">\_</span>_ <span class="se">\ </span>  Amazon ECS-Optimized Amazon Linux AMI 2015.09.d
+ ____|<span class="se">\_</span>__|____/
+
+For documentation visit, http://aws.amazon.com/documentation/ecs
+<span class="o">[</span>ec2-user@ip-10-0-26-91 ~]<span class="err">$</span>
+</code></pre>
+</div>
+
+<p>Some handy things you can do once you’re in to the instance:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">docker ps</code> show active docker containers</li>
+  <li><code class="highlighter-rouge">docker ps</code> -a show all docker containers including stopped/crashed ones</li>
+  <li><code class="highlighter-rouge">docker logs &lt;hash-from-docker-ps&gt;</code>/<code class="highlighter-rouge">docker logs --follow &lt;hash-from-docker-ps&gt;</code></li>
+</ul>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">The Clusternator Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-3">
+        <p>The Clusternator is a container deployment tool designed to help front end web developers manage deployments in their continuous integration flow. The Clusternator currently works with Docker, and Amazon's AWS cloud service.
+
+          The Clusternator uses the
+          <span><a href="/LICENSE">MIT License</a></span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
