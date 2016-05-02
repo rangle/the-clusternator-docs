@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: aws/ec2Skeletons</title>
+    <title>JSDoc: Source: src/aws/ec2/route-table.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -13,7 +13,7 @@
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link rel="stylesheet" href="/css/jsdoc.css">
     <link rel="stylesheet" href="/css/main.css">
-<link rel="canonical" href="/api/module-aws_ec2Skeletons.html">
+<link rel="canonical" href="/api/src_aws_ec2_route-table.js.html">
 <link rel="alternate" type="application/rss+xml" title="The Clusternator Documentation" href="/feed.xml">
 
 </head>
@@ -51,7 +51,7 @@
   <div class="wrapper">
     <article id="main">
       <header class="post-header">
-        <h1 class="post-title">Module: aws/ec2Skeletons</h1>
+        <h1 class="post-title">Source: src/aws/ec2/route-table.js</h1>
       </header>
 
       <div class="post-content">
@@ -59,120 +59,156 @@
 
 
 
-
-<section>
-
-<header>
     
-        
-            
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>Prototypes for assembling AWS ec2 entities</p></div>
-        
+const filter = require('./ec2-filter');
+const tag = require('./ec2-tag');
+const constants = require('../../constants');
+const util = require('../../util');
+const awsCommon = require('../common');
+const awsConstants = require('../aws-constants');
 
-        
-            
+module.exports = {
+  bindAws,
+  create,
+  describe,
+  destroy,
+  findDefault,
+  list
+};
 
+/**
+ * @param {AwsWrapper} aws
+ * @returns {Object} this API bound to
+ */
+function bindAws(aws) {
+  return awsCommon.bindAws(aws, module.exports);
+}
 
+/**
+ * @param {AwsWrapper} aws
+ * @returns {function(): Promise}
+ */
+function describe(aws) {
 
+  function promiseToDescribe() {
+    return aws.ec2.describeRouteTables({
+      DryRun: false,
+      Filters: [
+        filter.createVpc(aws.vpcId),
+        filter.createClusternator()
+      ]
+    });
+  }
 
+  return promiseToDescribe;
+}
 
+/**
+ * @param {AwsWrapper} aws
+ * @returns {function(): Promise&lt;object>}
+ */
+function create(aws) {
 
+  function promiseToCreate() {
+    return describe(aws)()
+      .then((desc) => desc.RouteTables &amp;&amp; desc.RouteTables.length ?
+        desc.RouteTables[0] :
+        aws.ec2
+          .createRouteTable({
+            VpcId: aws.vpcId
+          })
+          .then((result) => result.RouteTable)
+          .then((routeTable) => util.makeRetryPromiseFunction(tag
+            .tag(aws, [routeTable.RouteTableId], [tag.createClusternator()]),
+            awsConstants.AWS_RETRY_LIMIT,
+            awsConstants.AWS_RETRY_DELAY,
+            awsConstants.AWS_RETRY_MULTIPLIER,
+            null,
+            'create route-table tag')()
+            .then(() => routeTable)) );
+  }
 
+  return promiseToCreate;
+}
 
+/**
+ * @param {AwsWrapper} aws
+ * @param {string} routeTableId
+ * @returns {function(): Promise.&lt;string>}
+ * @throws {TypeError}
+ */
+function destroy(aws, routeTableId) {
+  if (!routeTableId) {
+    throw new TypeError('destroy requires a routeTableId');
+  }
 
+  function promiseToDestroy() {
+    return list(aws)()
+      .then((routes) => routes.indexOf(routeTableId) === -1 ?
+        'already deleted' :
+        aws.ec2
+          .deleteRouteTable({ RouteTableId: routeTableId })
+          .then(() => 'deleted'));
+  }
 
+  return promiseToDestroy;
+}
 
+/**
+ * @param {Object} el
+ * @returns {string}
+ */
+function mapDescription(el) {
+  return el.RouteTableId;
+}
 
+/**
+ * @param {Array} descriptions
+ * @returns {Array}
+ */
+function mapDescribeToRouteTableIds(descriptions) {
+  return descriptions.map(mapDescription);
+}
 
+/**
+ * @param {AwsWrapper} aws
+ * @returns {function(): Promise&lt;string[]>}
+ */
+function list(aws) {
 
+  function promiseToList() {
+    return describe(aws)()
+      .then((result) => mapDescribeToRouteTableIds(result.RouteTables));
+  }
 
-<dl class="details">
+  return promiseToList;
+}
 
-    
+/**
+ * @param {AwsWrapper} aws
+ * @returns {function(): Promise&lt;Object>}
+ */
+function findDefault(aws) {
+  function promiseToFindDefault() {
+    return describe(aws)().then((routes) => {
 
-    
+      if (routes.RouteTables &amp;&amp; routes.RouteTables.length) {
+        return routes.RouteTables[0];
+      }
+      
+      throw new Error('No Clusternator Route For VPC: ' + aws.vpcId);
+    });
+  }
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_aws_ec2Skeletons.js.html">src/aws/ec2Skeletons.js</a>, <a href="src_aws_ec2Skeletons.js.html#line4">line 4</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+  return promiseToFindDefault;
+}
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -213,11 +249,12 @@ Creates AWS ECS Aware EC2 units (vm's)</a></li><li><a href="module-api__0.1__cli
 
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon May 02 2016 11:40:31 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon May 02 2016 11:40:30 GMT-0400 (EDT)
   <span><a href="/LICENSE">MIT License</a></span>
 </footer>
 <script> prettyPrint(); </script>
 <script src="scripts/linenumber.js"> </script>
+
 
 <br class="clear">
 

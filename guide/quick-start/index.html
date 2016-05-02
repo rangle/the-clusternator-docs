@@ -65,9 +65,9 @@ organization has a <em>private</em> GitHub repository for your project.</p>
 
 <h3 id="part-1-install-the-clusternator-command-line-interface-cli">Part 1: Install the Clusternator Command-Line Interface (CLI)</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>npm install -g clusternator
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ npm install -g clusternator
+</code></p>
 
 <h3 id="part-2-log-in-to-the-clusternator">Part 2: Log In to the Clusternator</h3>
 
@@ -76,13 +76,13 @@ If you don’t, get your Clusternator administrator to create an account for you
 
 <p>If you are the Clusternator admin, create accounts like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator create-user
+<p><code class="highlighter-rouge">sh
+$ clusternator create-user
 ? Clusternator username clare
 ? Authority User
-? New Password <span class="k">******************</span>
-? Please Confirm Your Password <span class="k">******************</span>
-</code></pre>
-</div>
+? New Password ******************
+? Please Confirm Your Password ******************
+</code></p>
 
 <p>For <code class="highlighter-rouge">authority</code> the choices are <code class="highlighter-rouge">Admin</code>, <code class="highlighter-rouge">User</code>, and <code class="highlighter-rouge">Project Lead</code>.  Typically
 you’ll want to select <code class="highlighter-rouge">User</code> to create an account with limited privileges.</p>
@@ -91,13 +91,13 @@ you’ll want to select <code class="highlighter-rouge">User</code> to create an
 
 <p>Now that person can log in:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator login
+<p><code class="highlighter-rouge">sh
+$ clusternator login
 ? Clusternator username clare
-? Password <span class="k">******************</span>
+? Password ******************
 Login Successful
-? Do you want to save this token <span class="k">for </span>future use? Yes
-</code></pre>
-</div>
+? Do you want to save this token for future use? Yes
+</code></p>
 
 <p>Saving the token allows you to use the clusternator without having to re-login
 every time from this machine.</p>
@@ -105,19 +105,19 @@ every time from this machine.</p>
 <p>If this is a new account given to you by your administrator, it’s recommended
 that you select a new password for yourself:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ clusternator passwd
+<p><code class="highlighter-rouge">
+$ clusternator passwd
 ? Clusternator username clare
 ? Password *****************
 ? New Password ******************
 ? Please Confirm Your Password ******************
-</code></pre>
-</div>
+</code></p>
 
 <p>Note that you can logout from the clusternator at any time:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator <span class="nb">logout</span>
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ clusternator logout
+</code></p>
 
 <h3 id="part-3-you-are-using-a-project-someone-else-has-already-clusternated">Part 3: You are using a project someone else has already clusternated</h3>
 
@@ -125,10 +125,10 @@ that you select a new password for yourself:</p>
 
 <p><strong>Clone the project:</strong></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone ssh://git@github.com/my-organization/my-cool-project.git
-<span class="gp">$ </span><span class="nb">cd </span>my-cool-project
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ git clone ssh://git@github.com/my-organization/my-cool-project.git
+$ cd my-cool-project
+</code></p>
 
 <p><strong>Decrypt the project’s deployment configuration:</strong></p>
 
@@ -137,10 +137,10 @@ secrets for your project in an encrypted tarball that lives with the source code
 
 <p>In order to run locally you’ll need to decrypt it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator <span class="nb">read</span>-private -p <span class="k">$(</span>clusternator project shared-key<span class="k">)</span>
+<p><code class="highlighter-rouge">sh
+$ clusternator read-private -p $(clusternator project shared-key)
 info: Clusternator: Private files/directories un-encrypted
-</code></pre>
-</div>
+</code></p>
 
 <p>This creates local folder called <code class="highlighter-rouge">.private</code> that contains your application’s
 deployment secrets.  <strong>Do not share this folder with anyone or commit it to
@@ -149,28 +149,28 @@ git in unencrypted form</strong>.</p>
 <p>If you foresee a need to adjust anything in <code class="highlighter-rouge">.private</code>, then you should install
 the clusternator git hooks:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator git-hook-install
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ clusternator git-hook-install
+</code></p>
 
 <p>If you change anything in the <code class="highlighter-rouge">.private</code> folder, the git hooks will re-encrypt
 the bundle and add it to your next commit.</p>
 
 <p>If you don’t like git hooks and prefer to do this manually, the commands are:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator make-private -p <span class="k">$(</span>clusternator shared-key<span class="k">)</span>
-<span class="gp">$ </span>clusternator private-diff
-<span class="gp">$ </span>git add clusternator.tar.gz.asc
-<span class="gp">$ </span>git add .clusternator/.private-checksum
-<span class="gp">$ </span>git commit
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ clusternator make-private -p $(clusternator shared-key)
+$ clusternator private-diff
+$ git add clusternator.tar.gz.asc
+$ git add .clusternator/.private-checksum
+$ git commit
+</code></p>
 
 <p>You should now be able to run the project using</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator serve
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ clusternator serve
+</code></p>
 
 <h3 id="part-4-you-are-clusternating-a-new-project">Part 4: You are clusternating a new project</h3>
 
@@ -181,9 +181,9 @@ the bundle and add it to your next commit.</p>
 
 <p>Initialize the project and follow the prompts.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>clusternator init
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">sh
+$ clusternator init
+</code></p>
 
 <p>Follow the prompts
 If everything goes well there will be a <code class="highlighter-rouge">CLUSTERNATOR_SHARED_KEY</code>, and a
