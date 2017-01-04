@@ -59,7 +59,7 @@
 
 <ul>
   <li>nodejs</li>
-  <li>gpg</li>
+  <li>gpg (1.4)</li>
   <li>docker (optional)</li>
 </ul>
 
@@ -78,11 +78,14 @@ beyond the scope of this document.</p>
 
 <h2 id="gpg---gnu-privacy-guard">gpg - GNU Privacy Guard</h2>
 
-<p>There are a number of ways to install gpg on OS X.  Brew users can simply</p>
+<p>There are a number of ways to install gpg on OS X.  Brew users can  (as of 2017)</p>
 
 <p><code class="highlighter-rouge">
-brew install gpg
+brew install gpg1
+sudo ln -s /usr/local/bin/gpg1 /usr/local/bin/gpg
 </code></p>
+
+<p>The <code class="highlighter-rouge">ln -s</code> above used to not be an issue but as of 2017 brew ships with gpg2 as the default and it has an entirely different symmetric encryption model.</p>
 
 <p>GPG can also be manually installed by <a href="http://macgpg.sourceforge.net/" title="Mac GPG">visiting macgpg</a></p>
 
